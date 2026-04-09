@@ -53,9 +53,87 @@ uv run python pgd_ltx_vae.py --epsilon 0.06 --loss pixel
 | `--image_size` | varies | Resize input images to this size |
 | `--loss` | `pixel` | Attack mode: `pixel` or `latent` |
 
+## Running the Full Sweep
+
+To run all 60 experiments (5 models × 6 epsilons × 2 loss modes):
+
+```bash
+# All models sequentially
+bash run_sweep.sh
+
+# Single model
+bash run_sweep.sh sd15
+
+# Parallel across GPUs (one model per GPU)
+bash run_model_sweep.sh sd15 0 &
+bash run_model_sweep.sh flux1 1 &
+bash run_model_sweep.sh flux2 2 &
+bash run_model_sweep.sh cogvideox 3 &
+wait
+bash run_model_sweep.sh ltx 0  # after a GPU frees up
+```
+
+Epsilons tested: `0.02, 0.04, 0.06, 0.1, 0.15, 0.2` with alpha and iteration count scaled accordingly.
+
 ## Output
 
 Each run saves to `results/<model>_pgd/eps_<epsilon>_<loss>/`:
 - `*_adv.png` — adversarial images
 - `*_visualization.png` — 4-row comparison (original, latent channels, latent PCA, decoded)
 - `summary.json` — per-image and average metrics (pixel MSE, latent MSE, L-inf norms, reconstruction errors)
+
+## Analysis
+
+```bash
+uv run python analyze_results.py
+```
+
+Reads all `summary.json` files and generates:
+- `results/analysis/sweep_table.csv` — full results table (60 rows)
+- `results/analysis/sweep_decoded_damage.png` — decoded diff MSE vs epsilon curves
+- `results/analysis/sweep_latent_mse.png` — latent displacement vs epsilon
+- `results/analysis/sweep_amplification.png` — amplification factor vs epsilon
+- `results/analysis/matrix_heatmap.png` — heatmap across all (model, epsilon) pairs
+- `results/analysis/pixel_vs_latent_comparison.png` — pixel vs latent loss side-by-side
+
+## Results
+
+Full sweep: 5 models × 6 epsilons × 2 loss modes = 60 experiments, each on 5 test images.
+
+### Decoded Damage (Decoded Diff MSE) — Pixel Loss
+
+| Model | ε=0.02 | ε=0.04 | ε=0.06 | ε=0.1 | ε=0.15 | ε=0.2 |
+|---|---|---|---|---|---|---|
+| **SD 1.5** | 0.016 | 0.077 | 0.149 | 0.238 | 0.340 | 0.434 |
+| **FLUX.1** | 0.002 | 0.006 | 0.012 | 0.030 | 0.057 | 0.093 |
+| **FLUX.2** | 0.119 | 0.248 | 0.385 | 0.473 | 0.777 | 0.981 |
+| **CogVideoX** | 0.002 | 0.005 | 0.010 | 0.021 | 0.042 | 0.067 |
+| **LTX Video** | 0.005 | 0.014 | 0.157 | 0.216 | 0.094 | 0.150 |
+
+### Decoded Damage (Decoded Diff MSE) — Latent Loss
+
+| Model | ε=0.02 | ε=0.04 | ε=0.06 | ε=0.1 | ε=0.15 | ε=0.2 |
+|---|---|---|---|---|---|---|
+| **SD 1.5** | 0.004 | 0.007 | 0.010 | 0.018 | 0.029 | 0.042 |
+| **FLUX.1** | 0.001 | 0.004 | 0.008 | 0.017 | 0.034 | 0.054 |
+| **FLUX.2** | 0.004 | 0.005 | 0.010 | 0.013 | 0.019 | 0.024 |
+| **CogVideoX** | 0.001 | 0.002 | 0.003 | 0.007 | 0.013 | 0.022 |
+| **LTX Video** | 0.001 | 0.004 | 0.008 | 0.021 | 0.041 | 0.058 |
+
+### Key Findings
+
+**Robustness ranking (pixel-loss attack, most to least robust):**
+
+1. **CogVideoX** — Most robust across all epsilons. 3D video convolutions provide strong regularization. At ε=0.2, decoded damage is only 0.067.
+2. **FLUX.1** — Nearly as robust as CogVideoX. 16 latent channels with an effective decoder that suppresses adversarial directions. 0.093 at ε=0.2.
+3. **SD 1.5** — Moderate vulnerability. Steadily increasing damage curve. 0.434 at ε=0.2.
+4. **LTX Video** — Erratic behavior with high per-image variance (non-monotonic damage curve). Some images collapse catastrophically while others are barely affected.
+5. **FLUX.2** — Most vulnerable by far. Reaches 0.981 decoded MSE at ε=0.2 (near-total destruction). The 32-channel decoder massively amplifies small latent perturbations.
+
+**Pixel vs Latent loss paradox:**
+
+Across all models, latent-mode attacks achieve 2-10× larger latent displacements but cause 5-40× less decoded damage than pixel-mode attacks. This reveals that VAE decoders have a low-dimensional "sensitive subspace" — pixel-mode attacks find it (optimizing through the decoder), while latent-mode attacks spread perturbations into insensitive directions the decoder suppresses.
+
+**FLUX.2 anomaly:**
+
+FLUX.2 has extremely high pixel-loss vulnerability despite low latent MSE (only ~3.5 across all epsilons). Its 32-channel decoder is hypersensitive — tiny latent perturbations cause massive output damage. In latent mode, FLUX.2 achieves the highest latent MSE of any model (~32 at ε=0.2) but with minimal decoded damage (0.024), confirming that only specific latent directions matter.

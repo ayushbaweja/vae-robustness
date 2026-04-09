@@ -187,7 +187,7 @@ def main():
     parser = argparse.ArgumentParser(description="PGD attack on FLUX.2 VAE")
     parser.add_argument("--input_dir", type=str, default="resources/test-images")
     parser.add_argument("--output_dir", type=str, default="results/flux2_pgd")
-    parser.add_argument("--model_id", type=str, default="black-forest-labs/FLUX.2-schnell",
+    parser.add_argument("--model_id", type=str, default="black-forest-labs/FLUX.2-dev",
                         help="HF model ID for FLUX.2 (requires subfolder='vae')")
     parser.add_argument("--epsilon", type=float, default=0.06)
     parser.add_argument("--alpha", type=float, default=0.01)
