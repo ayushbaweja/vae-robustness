@@ -1,0 +1,73 @@
+{
+  "config": {
+    "input_dir": "resources/test-images",
+    "output_dir": "results/flux2_pgd",
+    "model_id": "black-forest-labs/FLUX.2-dev",
+    "epsilon": 0.02,
+    "alpha": 0.005,
+    "num_iter": 40,
+    "image_size": 512,
+    "loss": "pixel"
+  },
+  "per_image": [
+    {
+      "pixel_mse": 0.0002925327280536294,
+      "pixel_linf": 0.02000001072883606,
+      "latent_mse": 2.0658061504364014,
+      "latent_linf": 9.604850769042969,
+      "recon_mse_orig": 0.0011885197600349784,
+      "recon_mse_adv_vs_orig": 0.1518239676952362,
+      "decoded_diff_mse": 0.1501651257276535,
+      "image": "1_skiing.JPEG"
+    },
+    {
+      "pixel_mse": 0.00021311998716555536,
+      "pixel_linf": 0.02000001072883606,
+      "latent_mse": 1.8465694189071655,
+      "latent_linf": 8.736117362976074,
+      "recon_mse_orig": 0.0005135113606229424,
+      "recon_mse_adv_vs_orig": 0.017194904386997223,
+      "decoded_diff_mse": 0.017008261755108833,
+      "image": "2_man.JPEG"
+    },
+    {
+      "pixel_mse": 0.00027317259809933603,
+      "pixel_linf": 0.02000001072883606,
+      "latent_mse": 2.761568546295166,
+      "latent_linf": 14.52853775024414,
+      "recon_mse_orig": 0.0003647058620117605,
+      "recon_mse_adv_vs_orig": 0.13387250900268555,
+      "decoded_diff_mse": 0.13293834030628204,
+      "image": "3_baby.JPEG"
+    },
+    {
+      "pixel_mse": 0.00024119525915011764,
+      "pixel_linf": 0.02000001072883606,
+      "latent_mse": 1.9308898448944092,
+      "latent_linf": 8.772281646728516,
+      "recon_mse_orig": 0.0002405580598860979,
+      "recon_mse_adv_vs_orig": 0.23867349326610565,
+      "decoded_diff_mse": 0.23895208537578583,
+      "image": "4_sign.JPEG"
+    },
+    {
+      "pixel_mse": 0.00030158241861499846,
+      "pixel_linf": 0.02000001072883606,
+      "latent_mse": 2.2210466861724854,
+      "latent_linf": 17.640167236328125,
+      "recon_mse_orig": 0.00038984278216958046,
+      "recon_mse_adv_vs_orig": 0.057107023894786835,
+      "decoded_diff_mse": 0.05369716137647629,
+      "image": "5_woman.JPEG"
+    }
+  ],
+  "average": {
+    "pixel_mse": 0.000264,
+    "pixel_linf": 0.02,
+    "latent_mse": 2.165176,
+    "latent_linf": 11.856391,
+    "recon_mse_orig": 0.000539,
+    "recon_mse_adv_vs_orig": 0.119734,
+    "decoded_diff_mse": 0.118552
+  }
+}

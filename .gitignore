@@ -15,8 +15,5 @@ uv.lock
 # HuggingFace model cache
 .cache/
 
-# Experiment results (generated artifacts)
-results/
-
 # Experiment logs
 logs_*.txt
