@@ -21,6 +21,15 @@ matplotlib.use("Agg")
 RESULTS_DIR = Path("results")
 ANALYSIS_DIR = RESULTS_DIR / "analysis"
 
+# Trees of experiment results. Each tree has the same internal structure:
+#   <tree>/<model_subdir>/eps_<eps>_<loss>/summary.json
+# Per-image metrics are concatenated across trees so the analysis pools
+# images from every dataset (e.g. the original 5 + the imagenet25 set).
+RESULT_TREES = [
+    Path("results"),              # original 5-image set (legacy layout)
+    Path("results/imagenet25"),   # 25 ImageNet samples
+]
+
 # Model display names and result directories
 MODELS = {
     "SD 1.5":    "sd15_pgd",
@@ -42,36 +51,66 @@ EPSILONS = [0.02, 0.04, 0.06, 0.1, 0.15, 0.2]
 LOSSES = ["pixel", "latent"]
 
 
+def _recompute_average(per_image):
+    """Compute mean of every numeric per-image metric.
+
+    We re-derive `average` from the pooled per_image arrays rather than
+    averaging the per-tree `average` blocks, because the per-tree averages
+    are weighted by tree size and would bias the pooled mean if the trees
+    have different image counts.
+    """
+    if not per_image:
+        return {}
+    keys = [k for k, v in per_image[0].items() if isinstance(v, (int, float))]
+    return {k: float(np.mean([m[k] for m in per_image])) for k in keys}
+
+
 def load_all_results():
-    """Load all summary.json files into a structured dict."""
-    results = {}  # (model_name, epsilon, loss_mode) -> average metrics
+    """Load summary.json files from every tree in RESULT_TREES.
 
-    for model_name, result_dir in MODELS.items():
-        model_path = RESULTS_DIR / result_dir
-        if not model_path.exists():
+    Per-image metrics are concatenated across trees at the same
+    (model, eps, loss) key. Returns:
+        {(model_name, eps, loss): {"config", "average", "per_image", "trees"}}
+    where "trees" lists the tree roots that contributed.
+    """
+    results = {}
+
+    for tree in RESULT_TREES:
+        if not tree.exists():
             continue
-
-        for exp_dir in sorted(model_path.iterdir()):
-            if not exp_dir.is_dir():
+        # Avoid double-counting: skip imagenet25 subdir when iterating root
+        # by only consulting the explicit MODELS subdirs of this tree.
+        for model_name, result_dir in MODELS.items():
+            model_path = tree / result_dir
+            if not model_path.exists():
                 continue
-            summary_path = exp_dir / "summary.json"
-            if not summary_path.exists():
-                continue
 
-            with open(summary_path) as f:
-                data = json.load(f)
+            for exp_dir in sorted(model_path.iterdir()):
+                if not exp_dir.is_dir():
+                    continue
+                summary_path = exp_dir / "summary.json"
+                if not summary_path.exists():
+                    continue
 
-            config = data["config"]
-            eps = config["epsilon"]
-            loss = config.get("loss", "pixel")  # legacy runs default to pixel
+                with open(summary_path) as f:
+                    data = json.load(f)
 
-            key = (model_name, eps, loss)
-            results[key] = {
-                "config": config,
-                "average": data["average"],
-                "per_image": data["per_image"],
-            }
+                config = data["config"]
+                eps = config["epsilon"]
+                loss = config.get("loss", "pixel")  # legacy runs default to pixel
 
+                key = (model_name, eps, loss)
+                entry = results.setdefault(key, {
+                    "config": config,
+                    "per_image": [],
+                    "trees": [],
+                })
+                entry["per_image"].extend(data["per_image"])
+                entry["trees"].append(str(tree))
+
+    # Recompute averages from pooled per_image.
+    for key, entry in results.items():
+        entry["average"] = _recompute_average(entry["per_image"])
     return results
 
 
@@ -87,6 +126,8 @@ def write_csv(results):
             "model": model,
             "epsilon": eps,
             "loss_mode": loss,
+            "n_images": len(data["per_image"]),
+            "trees": ";".join(data["trees"]),
             "pixel_mse": avg["pixel_mse"],
             "pixel_linf": avg["pixel_linf"],
             "latent_mse": avg["latent_mse"],
@@ -106,27 +147,55 @@ def write_csv(results):
     return rows
 
 
-def plot_sweep(results, metric, ylabel, title, filename, log_y=False):
-    """Plot metric vs epsilon, one subplot per loss mode, one curve per model."""
+def _per_image_values(per_image, metric):
+    """Extract a 1-D array of per-image values for the given metric."""
+    if metric == "amplification":
+        vals = []
+        for m in per_image:
+            px = m["pixel_mse"]
+            vals.append(m["latent_mse"] / px if px > 0 else 0.0)
+        return np.array(vals, dtype=float)
+    return np.array([m[metric] for m in per_image], dtype=float)
+
+
+def plot_sweep(results, metric, ylabel, title, filename, log_y=False, band="stderr"):
+    """Plot metric vs epsilon with shaded variability across images.
+
+    The solid line is the per-image mean; the shaded band is ±1 SEM
+    (band="stderr") or ±1 SD (band="std") computed from the per_image
+    metrics already stored in each summary.json.
+    """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5.5), sharey=True)
 
+    n_seen = []
     for ax_idx, loss in enumerate(LOSSES):
         ax = axes[ax_idx]
         for model_name in MODELS:
-            xs, ys = [], []
+            xs, means, los, his = [], [], [], []
             for eps in EPSILONS:
                 key = (model_name, eps, loss)
-                if key in results:
-                    xs.append(eps)
-                    avg = results[key]["average"]
-                    if metric == "amplification":
-                        val = avg["latent_mse"] / avg["pixel_mse"] if avg["pixel_mse"] > 0 else 0
-                    else:
-                        val = avg[metric]
-                    ys.append(val)
+                if key not in results:
+                    continue
+                vals = _per_image_values(results[key]["per_image"], metric)
+                if len(vals) == 0:
+                    continue
+                n = len(vals)
+                m = float(vals.mean())
+                if n > 1:
+                    s = float(vals.std(ddof=1))
+                    spread = s / np.sqrt(n) if band == "stderr" else s
+                else:
+                    spread = 0.0
+                xs.append(eps)
+                means.append(m)
+                los.append(m - spread)
+                his.append(m + spread)
+                n_seen.append(n)
 
             if xs:
-                ax.plot(xs, ys, "o-", color=MODEL_COLORS[model_name],
+                color = MODEL_COLORS[model_name]
+                ax.fill_between(xs, los, his, color=color, alpha=0.18, linewidth=0)
+                ax.plot(xs, means, "o-", color=color,
                         label=model_name, linewidth=2, markersize=6)
 
         ax.set_xlabel("Epsilon (L∞ budget)", fontsize=12)
@@ -139,7 +208,14 @@ def plot_sweep(results, metric, ylabel, title, filename, log_y=False):
         if log_y:
             ax.set_yscale("log")
 
-    fig.suptitle(title, fontsize=14, fontweight="bold")
+    band_label = "±1 SEM" if band == "stderr" else "±1 SD"
+    if n_seen:
+        lo_n, hi_n = min(n_seen), max(n_seen)
+        n_text = f"n={lo_n}" if lo_n == hi_n else f"n={lo_n}–{hi_n}"
+    else:
+        n_text = "n=?"
+    fig.suptitle(f"{title}  (shaded: {band_label} across images, {n_text})",
+                 fontsize=14, fontweight="bold")
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     out_path = ANALYSIS_DIR / filename
     plt.savefig(out_path, dpi=150, bbox_inches="tight")
