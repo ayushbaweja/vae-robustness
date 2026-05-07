@@ -1,0 +1,86 @@
+{
+  "config": {
+    "model": "flux2",
+    "input_dir": "resources/test-images",
+    "output_dir": "results/autoattack",
+    "model_id": "black-forest-labs/FLUX.2-dev",
+    "epsilon": 0.2,
+    "image_size": 512,
+    "apgd_steps": 150,
+    "square_steps": 300,
+    "apgd_restarts": 2,
+    "ensemble": [
+      "apgd_recon",
+      "apgd_decoded",
+      "apgd_latent",
+      "square_decoded"
+    ],
+    "selection_metric": "decoded_diff_mse"
+  },
+  "per_image": [
+    {
+      "pixel_mse": 0.025603190064430237,
+      "pixel_linf": 0.20000000298023224,
+      "latent_mse": 4.242129802703857,
+      "latent_linf": 10.297727584838867,
+      "recon_mse_orig": 0.0011885197600349784,
+      "recon_mse_adv_vs_orig": 1.3982213735580444,
+      "decoded_diff_mse": 1.4020307064056396,
+      "image": "1_skiing.JPEG",
+      "best_attack": "apgd_decoded"
+    },
+    {
+      "pixel_mse": 0.021664220839738846,
+      "pixel_linf": 0.20000000298023224,
+      "latent_mse": 2.6395256519317627,
+      "latent_linf": 12.569608688354492,
+      "recon_mse_orig": 0.0005135113606229424,
+      "recon_mse_adv_vs_orig": 1.253418207168579,
+      "decoded_diff_mse": 1.2514420747756958,
+      "image": "2_man.JPEG",
+      "best_attack": "apgd_decoded"
+    },
+    {
+      "pixel_mse": 0.026749780401587486,
+      "pixel_linf": 0.20000000298023224,
+      "latent_mse": 5.061338901519775,
+      "latent_linf": 14.456480026245117,
+      "recon_mse_orig": 0.0003647058620117605,
+      "recon_mse_adv_vs_orig": 1.3308029174804688,
+      "decoded_diff_mse": 1.3344529867172241,
+      "image": "3_baby.JPEG",
+      "best_attack": "apgd_decoded"
+    },
+    {
+      "pixel_mse": 0.025414740666747093,
+      "pixel_linf": 0.20000000298023224,
+      "latent_mse": 3.11368989944458,
+      "latent_linf": 20.954696655273438,
+      "recon_mse_orig": 0.0002405580598860979,
+      "recon_mse_adv_vs_orig": 1.3879015445709229,
+      "decoded_diff_mse": 1.3906968832015991,
+      "image": "4_sign.JPEG",
+      "best_attack": "apgd_decoded"
+    },
+    {
+      "pixel_mse": 0.025092391297221184,
+      "pixel_linf": 0.20000000298023224,
+      "latent_mse": 3.9180471897125244,
+      "latent_linf": 14.958989143371582,
+      "recon_mse_orig": 0.00038984278216958046,
+      "recon_mse_adv_vs_orig": 1.7528151273727417,
+      "decoded_diff_mse": 1.7672719955444336,
+      "image": "5_woman.JPEG",
+      "best_attack": "apgd_decoded"
+    }
+  ],
+  "average": {
+    "pixel_mse": 0.024905,
+    "pixel_linf": 0.2,
+    "latent_mse": 3.794946,
+    "latent_linf": 14.6475,
+    "recon_mse_orig": 0.000539,
+    "recon_mse_adv_vs_orig": 1.424632,
+    "decoded_diff_mse": 1.429179
+  }
+}

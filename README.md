@@ -39,6 +39,9 @@ uv run python pgd_cogvideox_vae.py --epsilon 0.06 --loss pixel
 
 # LTX Video
 uv run python pgd_ltx_vae.py --epsilon 0.06 --loss pixel
+
+# AutoAttack-style ensemble
+uv run python autoattack_vae.py --model sd15 --epsilon 0.06
 ```
 
 ### Common arguments
@@ -52,6 +55,21 @@ uv run python pgd_ltx_vae.py --epsilon 0.06 --loss pixel
 | `--num_iter` | `40` | Number of PGD iterations |
 | `--image_size` | varies | Resize input images to this size |
 | `--loss` | `pixel` | Attack mode: `pixel` or `latent` |
+
+### AutoAttack-style ensemble
+
+`autoattack_vae.py` is a VAE-adapted ensemble attack rather than the original classification `AutoAttack` package. It runs:
+- `apgd_recon` — adaptive PGD maximizing decoded reconstruction error against the clean input
+- `apgd_decoded` — adaptive PGD maximizing decoded drift against the clean reconstruction
+- `apgd_latent` — adaptive PGD maximizing encoder latent displacement
+- `square_decoded` — square-style black-box patch search on decoded drift
+
+For each image it keeps the adversarial example with the largest `decoded_diff_mse`, which makes it a stronger and less optimizer-sensitive robustness check than a single fixed-step PGD run.
+
+```bash
+uv run python autoattack_vae.py --model flux2 --epsilon 0.06
+uv run python autoattack_vae.py --model ltx --epsilon 0.10 --apgd_steps 150 --square_steps 300
+```
 
 ## Running the Full Sweep
 
@@ -73,6 +91,24 @@ wait
 bash run_model_sweep.sh ltx 0  # after a GPU frees up
 ```
 
+AutoAttack-style full sweep:
+
+```bash
+# All models sequentially
+bash run_autoattack_sweep.sh
+
+# Single model
+bash run_autoattack_sweep.sh flux2
+
+# Parallel across GPUs
+bash run_autoattack_model_sweep.sh sd15 0 &
+bash run_autoattack_model_sweep.sh flux1 1 &
+bash run_autoattack_model_sweep.sh flux2 2 &
+bash run_autoattack_model_sweep.sh cogvideox 3 &
+wait
+bash run_autoattack_model_sweep.sh ltx 0
+```
+
 Epsilons tested: `0.02, 0.04, 0.06, 0.1, 0.15, 0.2` with alpha and iteration count scaled accordingly.
 
 ## Output
@@ -86,6 +122,7 @@ Each run saves to `results/<model>_pgd/eps_<epsilon>_<loss>/`:
 
 ```bash
 uv run python analyze_results.py
+uv run python analyze_autoattack_results.py
 ```
 
 Reads all `summary.json` files and generates:
@@ -95,6 +132,16 @@ Reads all `summary.json` files and generates:
 - `results/analysis/sweep_amplification.png` — amplification factor vs epsilon
 - `results/analysis/matrix_heatmap.png` — heatmap across all (model, epsilon) pairs
 - `results/analysis/pixel_vs_latent_comparison.png` — pixel vs latent loss side-by-side
+
+AutoAttack analysis writes to `results/analysis_autoattack/`:
+- `autoattack_sweep_table.csv` — full AutoAttack table
+- `autoattack_decoded_damage.png` — decoded diff MSE vs epsilon
+- `autoattack_latent_mse.png` — latent displacement vs epsilon
+- `autoattack_amplification.png` — latent amplification vs epsilon
+- `autoattack_heatmap.png` — decoded damage heatmap
+- `autoattack_best_attack_share.png` — which sub-attack wins per image
+- `autoattack_vs_pgd_pixel.png` — AutoAttack vs PGD pixel-loss comparison, when PGD results exist
+- `autoattack_vs_pgd_gain_heatmap.png` — AutoAttack/PGD ratio and absolute damage gap heatmaps
 
 ## Results
 

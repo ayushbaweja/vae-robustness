@@ -1,0 +1,273 @@
+{
+  "config": {
+    "input_dir": "/ssdscratch/abaweja7/vae-robustness/resources/test-images-imagenet25",
+    "output_dir": "/ssdscratch/abaweja7/vae-robustness/results/imagenet25/cogvideox_pgd",
+    "model_id": "THUDM/CogVideoX-2b",
+    "epsilon": 0.04,
+    "alpha": 0.007,
+    "num_iter": 40,
+    "image_size": 480,
+    "loss": "latent"
+  },
+  "per_image": [
+    {
+      "pixel_mse": 0.0015015782555565238,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.12219912558794022,
+      "latent_linf": 6.80388069152832,
+      "recon_mse_orig": 0.01699071191251278,
+      "recon_mse_adv_vs_orig": 0.01935788430273533,
+      "decoded_diff_mse": 0.008064378052949905,
+      "image": "n01629819_European_fire_salamander.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013767143245786428,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.27681833505630493,
+      "latent_linf": 7.428854465484619,
+      "recon_mse_orig": 0.006895901635289192,
+      "recon_mse_adv_vs_orig": 0.008945656009018421,
+      "decoded_diff_mse": 0.004635621327906847,
+      "image": "n01631663_eft.JPEG"
+    },
+    {
+      "pixel_mse": 0.001318285707384348,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.375612735748291,
+      "latent_linf": 7.237061500549316,
+      "recon_mse_orig": 0.0034897190053015947,
+      "recon_mse_adv_vs_orig": 0.005255058873444796,
+      "decoded_diff_mse": 0.003166517708450556,
+      "image": "n01641577_bullfrog.JPEG"
+    },
+    {
+      "pixel_mse": 0.001311158761382103,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.4609442353248596,
+      "latent_linf": 7.914786338806152,
+      "recon_mse_orig": 0.0011644493788480759,
+      "recon_mse_adv_vs_orig": 0.003011007560417056,
+      "decoded_diff_mse": 0.0025700449477881193,
+      "image": "n01644900_tailed_frog.JPEG"
+    },
+    {
+      "pixel_mse": 0.0014061758993193507,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.2858675420284271,
+      "latent_linf": 7.0231757164001465,
+      "recon_mse_orig": 0.007008698768913746,
+      "recon_mse_adv_vs_orig": 0.0088186701759696,
+      "decoded_diff_mse": 0.0037466278299689293,
+      "image": "n01819313_sulphur-crested_cockatoo.JPEG"
+    },
+    {
+      "pixel_mse": 0.0010967261623591185,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.7189499139785767,
+      "latent_linf": 8.607693672180176,
+      "recon_mse_orig": 0.003190887626260519,
+      "recon_mse_adv_vs_orig": 0.004949565511196852,
+      "decoded_diff_mse": 0.002643410349264741,
+      "image": "n01843065_jacamar.JPEG"
+    },
+    {
+      "pixel_mse": 0.0015042455634102225,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.1310526579618454,
+      "latent_linf": 7.035683631896973,
+      "recon_mse_orig": 0.01198105700314045,
+      "recon_mse_adv_vs_orig": 0.014164123684167862,
+      "decoded_diff_mse": 0.005322872661054134,
+      "image": "n01877812_wallaby.JPEG"
+    },
+    {
+      "pixel_mse": 0.001200545928440988,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.5723831057548523,
+      "latent_linf": 7.615234851837158,
+      "recon_mse_orig": 0.0012890853686258197,
+      "recon_mse_adv_vs_orig": 0.0028592271264642477,
+      "decoded_diff_mse": 0.002260226057842374,
+      "image": "n01945685_slug.JPEG"
+    },
+    {
+      "pixel_mse": 0.00145511154551059,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.22895687818527222,
+      "latent_linf": 7.696033954620361,
+      "recon_mse_orig": 0.007211873773485422,
+      "recon_mse_adv_vs_orig": 0.00973464548587799,
+      "decoded_diff_mse": 0.005104206968098879,
+      "image": "n02033041_dowitcher.JPEG"
+    },
+    {
+      "pixel_mse": 0.001166821108199656,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.5543959140777588,
+      "latent_linf": 7.122393608093262,
+      "recon_mse_orig": 0.0008757156901992857,
+      "recon_mse_adv_vs_orig": 0.0022930228151381016,
+      "decoded_diff_mse": 0.0017641643062233925,
+      "image": "n02104365_schipperke.JPEG"
+    },
+    {
+      "pixel_mse": 0.001440204563550651,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.21616102755069733,
+      "latent_linf": 6.154174327850342,
+      "recon_mse_orig": 0.0020047444850206375,
+      "recon_mse_adv_vs_orig": 0.0045499252155423164,
+      "decoded_diff_mse": 0.003467606147751212,
+      "image": "n02105505_komondor.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013129370054230094,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.4303479492664337,
+      "latent_linf": 7.8222551345825195,
+      "recon_mse_orig": 0.0022698959801346064,
+      "recon_mse_adv_vs_orig": 0.0037535117007791996,
+      "decoded_diff_mse": 0.0029796077869832516,
+      "image": "n02107574_Greater_Swiss_Mountain_dog.JPEG"
+    },
+    {
+      "pixel_mse": 0.0012272805906832218,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.6147758960723877,
+      "latent_linf": 7.9125566482543945,
+      "recon_mse_orig": 0.000839760759845376,
+      "recon_mse_adv_vs_orig": 0.0022980293724685907,
+      "decoded_diff_mse": 0.002084876410663128,
+      "image": "n02110185_Siberian_husky.JPEG"
+    },
+    {
+      "pixel_mse": 0.0011070341570302844,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.6581090092658997,
+      "latent_linf": 7.872379302978516,
+      "recon_mse_orig": 0.0009696400375105441,
+      "recon_mse_adv_vs_orig": 0.002251495374366641,
+      "decoded_diff_mse": 0.0017918609082698822,
+      "image": "n02123045_tabby.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013475511223077774,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.32934999465942383,
+      "latent_linf": 7.276798248291016,
+      "recon_mse_orig": 0.004696583840996027,
+      "recon_mse_adv_vs_orig": 0.006954137235879898,
+      "decoded_diff_mse": 0.0036509602796286345,
+      "image": "n02804610_bassoon.JPEG"
+    },
+    {
+      "pixel_mse": 0.001155923935584724,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.6040132641792297,
+      "latent_linf": 8.128981590270996,
+      "recon_mse_orig": 0.0015991174150258303,
+      "recon_mse_adv_vs_orig": 0.0032103811390697956,
+      "decoded_diff_mse": 0.0020219904836267233,
+      "image": "n03126707_crane.JPEG"
+    },
+    {
+      "pixel_mse": 0.0012437559198588133,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.4384578466415405,
+      "latent_linf": 6.822139739990234,
+      "recon_mse_orig": 0.0026420322246849537,
+      "recon_mse_adv_vs_orig": 0.004277961794286966,
+      "decoded_diff_mse": 0.002495858818292618,
+      "image": "n03372029_flute.JPEG"
+    },
+    {
+      "pixel_mse": 0.0008212579414248466,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.5546778440475464,
+      "latent_linf": 6.056367874145508,
+      "recon_mse_orig": 0.0003573164576664567,
+      "recon_mse_adv_vs_orig": 0.0014243650948628783,
+      "decoded_diff_mse": 0.0012216649483889341,
+      "image": "n03544143_hourglass.JPEG"
+    },
+    {
+      "pixel_mse": 0.0012297588400542736,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.5272745490074158,
+      "latent_linf": 8.895295143127441,
+      "recon_mse_orig": 0.0017177917761728168,
+      "recon_mse_adv_vs_orig": 0.0033837000373750925,
+      "decoded_diff_mse": 0.0026429565623402596,
+      "image": "n03627232_knot.JPEG"
+    },
+    {
+      "pixel_mse": 0.001205327920615673,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.5407556295394897,
+      "latent_linf": 7.946252822875977,
+      "recon_mse_orig": 0.0012326405849307775,
+      "recon_mse_adv_vs_orig": 0.0029637019615620375,
+      "decoded_diff_mse": 0.0021371522452682257,
+      "image": "n03769881_minibus.JPEG"
+    },
+    {
+      "pixel_mse": 0.00140921410638839,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.23781515657901764,
+      "latent_linf": 8.151734352111816,
+      "recon_mse_orig": 0.010025418363511562,
+      "recon_mse_adv_vs_orig": 0.012036564759910107,
+      "decoded_diff_mse": 0.005975072737783194,
+      "image": "n03871628_packet.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013968178536742926,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.2706265449523926,
+      "latent_linf": 7.1268486976623535,
+      "recon_mse_orig": 0.0056381854228675365,
+      "recon_mse_adv_vs_orig": 0.007816278375685215,
+      "decoded_diff_mse": 0.00419775303453207,
+      "image": "n04041544_radio.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013112080050632358,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.4440946877002716,
+      "latent_linf": 7.2320556640625,
+      "recon_mse_orig": 0.0017752283019945025,
+      "recon_mse_adv_vs_orig": 0.0037762895226478577,
+      "decoded_diff_mse": 0.0026515324134379625,
+      "image": "n04067472_reel.JPEG"
+    },
+    {
+      "pixel_mse": 0.0012074687983840704,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.49795737862586975,
+      "latent_linf": 7.164000511169434,
+      "recon_mse_orig": 0.00212304200977087,
+      "recon_mse_adv_vs_orig": 0.0036839304957538843,
+      "decoded_diff_mse": 0.002776899142190814,
+      "image": "n04069434_reflex_camera.JPEG"
+    },
+    {
+      "pixel_mse": 0.0013761811424046755,
+      "pixel_linf": 0.04000002145767212,
+      "latent_mse": 0.32067906856536865,
+      "latent_linf": 9.032547950744629,
+      "recon_mse_orig": 0.009550211019814014,
+      "recon_mse_adv_vs_orig": 0.011606713756918907,
+      "decoded_diff_mse": 0.004931758623570204,
+      "image": "n04606251_wreck.JPEG"
+    }
+  ],
+  "average": {
+    "pixel_mse": 0.001285,
+    "pixel_linf": 0.04,
+    "latent_mse": 0.416491,
+    "latent_linf": 7.523167,
+    "recon_mse_orig": 0.004302,
+    "recon_mse_adv_vs_orig": 0.006135,
+    "decoded_diff_mse": 0.003372
+  }
+}
