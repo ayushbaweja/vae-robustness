@@ -321,46 +321,66 @@ Yes. The effect size is large enough that the qualitative conclusion is unlikely
 
 But for publication-quality claims, rerun with pinned model revisions.
 
-## Suggested Follow-Up Experiments
+## Follow-Up Experiments — Results
 
-### 1. Decoder-only latent perturbation test
+The Jacobian-factorization experiments below have now been **run**; full method,
+plots, and tables are in `jacobian_experiments_results.md`
+(`results/jacobian/{decoder,encoder,freq}/`). All latent quantities are
+normalized per-channel by the clean per-channel std so the 16-ch and 32-ch
+latent spaces are compared fairly (item 5 below). Headline numbers are mean over
+5 test images.
 
-Add random and adversarial latent-space perturbations directly to `z = E(x)`:
+### 1. Decoder-only latent perturbation test — `J_D` (done)
 
-```text
-z_adv = z + eta
-D(z_adv) vs D(z)
-```
+Perturbed `z` directly (`z + η`) at equal std-normalized budget and measured
+`‖D(z+η) − D(z)‖ / ‖η‖_std`. **Finding: a split result.** For *random* normalized
+latent noise FLUX.2's decoder is actually *less* sensitive (~0.34 vs ~1.0 gain),
+but for the *worst-case* direction (power iteration) it is **~2.5× more
+sensitive** (~8 vs ~3). FLUX.2's decoder is not globally sharper — it is far more
+**anisotropic** (worst-case/random ratio ~24× vs ~3×), with a few very sharp
+directions an attacker can exploit. So "the high-fidelity decoder amplifies"
+holds specifically for adversarially chosen latent directions, not generic noise.
 
-Compare FLUX.1 and FLUX.2 for equal normalized latent perturbation sizes. This isolates decoder sensitivity from encoder sensitivity.
+### 2. Encoder Jacobian norm estimate — `J_E` (done)
 
-### 2. Encoder Jacobian norm estimate
+Measured `‖(E(x+δ) − E(x))/s_c‖ / ‖δ‖` for random, PGD-latent, and PGD-pixel
+directions. **Finding: confirmed, and direction-specific.** Random pixel
+perturbations move both encoders' (normalized) latents comparably (~1.3× gap),
+but the worst-case encoder direction moves FLUX.2's latent **3.6–5.2× further**
+in std-units, and the damaging PGD-pixel direction ~1.9×. FLUX.1's tighter
+bottleneck genuinely shrinks the *adversarial* perturbation more — the fair,
+per-std version of the report's `latent_linf` hint.
 
-Estimate local encoder sensitivity:
+### 3. Decoder Jacobian norm estimate (done)
 
-```text
-||E(x + delta) - E(x)|| / ||delta||
-```
+Covered by item 1 — FLUX.2's decoder has larger worst-case local amplification
+(~2.5×), smaller average amplification.
 
-Use random directions and PGD directions separately.
+### 4. Frequency analysis of perturbations (done)
 
-### 3. Decoder Jacobian norm estimate
+**Part A (spectrum of adversarial δ): not discriminative** — both models' PGD δ
+are broadband, low/mid-frequency dominated, with near-identical high-freq tails
+(~4% of power above 0.25 cyc/px for both). The attack's *raw* spectrum is not the
+differentiator. **Part B (band-survival, the cleaner probe): confirms the sieve.**
+Pushing fixed-norm, band-limited perturbations through the round-trip, FLUX.1's
+survival drops at high frequency (→ 0.82 near Nyquist) while FLUX.2 stays at or
+above 1.0 (→ 1.21 at 0.18 cyc/px). FLUX.1's round-trip low-passes exactly the
+high-frequency content an L∞ attack relies on; FLUX.2 passes it through.
 
-Estimate:
+### 5. Equalized latent metric (adopted)
 
-```text
-||D(z + eta) - D(z)|| / ||eta||
-```
+All encoder/decoder latent metrics above use per-channel-std normalization;
+cross-model claims otherwise use pixel-space (decoded) quantities only. Raw
+16-ch vs 32-ch latent MSE is never compared directly.
 
-This directly tests whether FLUX.2's decoder has larger local amplification.
+### Net result
 
-### 4. Frequency analysis of perturbations
-
-Measure whether successful FLUX.2 perturbations are high-frequency or structured. If FLUX.1 filters high-frequency perturbations better, this would support the bottleneck/smoothing hypothesis.
-
-### 5. Equalized latent metric
-
-Normalize latent perturbations by per-channel standard deviation or use decoded metrics only. Avoid comparing unnormalized latent MSE across 16-channel and 32-channel VAEs.
+The round-trip robustness gap **factorizes**: at ε = 0.06 the product of the
+independently measured encoder gap (~1.9×) and decoder worst-case gap (~2.6×) is
+~4.8×, matching the measured round-trip pixel-gain ratio of ~5.1×. Both Jacobian
+factors favor FLUX.1, both only along *adversarial* directions, and the mechanism
+is frequency-selective — consistent with the bottleneck-as-sieve picture in
+`understanding_vae_robustness.md`.
 
 ## Conclusion
 
