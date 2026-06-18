@@ -202,7 +202,7 @@ def main():
     parser = argparse.ArgumentParser(description="PGD attack on FLUX.1 VAE")
     parser.add_argument("--input_dir", type=str, default="resources/test-images")
     parser.add_argument("--output_dir", type=str, default="results/flux1_pgd")
-    parser.add_argument("--model_id", type=str, default="black-forest-labs/FLUX.1-schnell")
+    parser.add_argument("--model_id", type=str, default="black-forest-labs/FLUX.1-dev")
     parser.add_argument("--epsilon", type=float, default=0.06)
     parser.add_argument("--alpha", type=float, default=0.01)
     parser.add_argument("--num_iter", type=int, default=40)

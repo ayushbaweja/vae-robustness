@@ -35,7 +35,7 @@ MODEL_SPECS = {
     ),
     "flux1": ModelSpec(
         name="flux1",
-        model_id="black-forest-labs/FLUX.1-schnell",
+        model_id="black-forest-labs/FLUX.1-dev",
         image_size=512,
         is_video=False,
         loader=AutoencoderKL,
